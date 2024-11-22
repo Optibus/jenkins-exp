@@ -28,6 +28,22 @@ jobs:
     steps:
       - run: echo "Building the image"
 
+  trigger-jenkins-job:
+    resource_class: optibus/small
+    docker:
+      - image: circleci/node:12.22.7
+
+    steps:
+      - checkout
+      - run:
+          name: "Install dependencies"
+          command: npm install
+          working_directory: ci
+
+      - run:
+          name: "Trigger Jenkins Job"
+          command: npm run trigger "Testers/Thiago/Jenkins-exp Feature branches - Push/$CIRCLE_BRANCH"
+          working_directory: ci
 workflows:
   test_and_build:
     jobs:
@@ -35,3 +51,6 @@ workflows:
       - build_image:
           requires:
             - test
+      - trigger-jenkins-job:
+          requires:
+            - build_image
